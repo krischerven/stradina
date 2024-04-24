@@ -19,6 +19,14 @@
   `(binding [*ignoring-city* true]
      ~@body))
 
+(defonce ^:dynamic *cache-messages-on* true)
+(defmacro without-cache-messages [& body]
+  `(binding [*cache-messages-on* false]
+     ~@body))
+
+(defn cache-messages []
+  (and (store-get :print-cache-messages) *cache-messages-on*))
+
 (defn --get-directions
   "Get the directions from origin to destination using the Google Directions API.
   Do not call this function directly from the REPL; instead, use print-directions."
@@ -46,10 +54,12 @@
                       (cache-get cache-key))]
 
       (when cache-val
-        (when (store-get :print-cache-messages)
+        (if (cache-messages)
           (formatln (str "Using cached directions (as of %s). "
                          "To invalidate this cache, run '(cache-dissoc \"%s\")'\n")
-                    (:date cache-val) cache-key))
+                    (:date cache-val) cache-key)
+          (when *cache-messages-on*
+            (println "(Using cached data)")))
         (assert (and (:date cache-val) (:data cache-val))))
 
       (let [response (if cache-val nil (client/get url))
@@ -109,7 +119,7 @@
         data (or (:data cache-val)
                  (-> (client/get url {:query-params params}) :body (json/read-str :key-fn keyword)))]
     (when cache-val
-      (when (store-get :print-cache-messages)
+      (when (cache-messages)
         (formatln (str "Using cached autocomplete data (as of %s). "
                        "To invalidate this cache, run '(cache-dissoc \"%s\")'\n")
                   (:date cache-val) cache-key))
