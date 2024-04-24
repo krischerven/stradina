@@ -203,6 +203,18 @@
      (when (:cache-val (get-directions-get-url-and-cache-kv origin destination))
        (println (:directions (--get-directions origin destination)))))))
 
+(defn add-walk-data-point-from-directions [origin destination time]
+  (let [distance (:distance (get-directions origin destination))]
+    (add-walk-data-point (str origin " to " destination) distance time)))
+
+(defn add-jog-data-point-from-directions [origin destination time]
+  (let [distance (:distance (get-directions origin destination))]
+    (add-jog-data-point (str origin " to " destination) distance time)))
+
+(defn add-run-data-point-from-directions [origin destination time]
+  (let [distance (:distance (get-directions origin destination))]
+    (add-run-data-point (str origin " to " destination) distance time)))
+
 (defn find-path []
   (let [str (read-line)
         split (str/split str #" to ")]
