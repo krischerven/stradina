@@ -27,6 +27,21 @@
 (defn cache-messages []
   (and (store-get :print-cache-messages) *cache-messages-on*))
 
+(defn get-directions-get-url-and-cache-kv [origin destination]
+  (let [url (str "https://maps.googleapis.com/maps/api/directions/json"
+                 "?origin=" origin
+                 "&destination=" destination
+                 "&mode=walking"
+                 "&key=" (get-API-key :maps))
+        cache-key url]
+    {:url url
+     :cache-key cache-key
+     :cache-val (if *invalidating-cache*
+                  (do
+                    (cache-dissoc cache-key)
+                    nil)
+                  (cache-get cache-key))}))
+
 (defn --get-directions
   "Get the directions from origin to destination using the Google Directions API.
   Do not call this function directly from the REPL; instead, use print-directions."
@@ -41,17 +56,10 @@
                           (yesno "Continue anyway?"))
                         true)]
 
-    (let [url (str "https://maps.googleapis.com/maps/api/directions/json"
-                   "?origin=" origin
-                   "&destination=" destination
-                   "&mode=walking"
-                   "&key=" (get-API-key :maps))
-          cache-key url
-          cache-val (if *invalidating-cache*
-                      (do
-                        (cache-dissoc cache-key)
-                        nil)
-                      (cache-get cache-key))]
+    (let [{url :url
+           cache-key :cache-key
+           cache-val :cache-val}
+          (get-directions-get-url-and-cache-kv origin destination)]
 
       (when cache-val
         (if (cache-messages)
@@ -81,20 +89,21 @@
             (if (seq steps)
               (recur (str dirs (strip-html (:html_instructions (first steps))) "\n") (rest steps))
                 ;; Maps API quirk
-              (str (string-replace-multi dirs [["Destination will be on the"
-                                                "\nYour destination will be on the"]
-                                               ["Take the stairs"
-                                                "\nTake the stairs"]
-                                               ["Pass by"
-                                                "\nPass by"]
-                                               ["will be on the right" "will be on the right."]
-                                               ["will be on the left" "will be on the left."]])
-                   "\nThis will be a " distance " (" distance-v " meter)" " walk taking up to "
-                   (str/replace duration "mins" "minutes") ",\n"
-                   "but probably ~" (math/movement-speed distance-v (my-average-walk-speed))
-                   " minutes (your personalized estimate),\n"
-                   "or a ~" (math/movement-speed distance-v (my-average-jog-speed)) " minute jog,\n"
-                   "or a ~" (math/movement-speed distance-v (my-average-run-speed)) " minute run."))))))))
+              {:directions (str (string-replace-multi dirs [["Destination will be on the"
+                                                             "\nYour destination will be on the"]
+                                                            ["Take the stairs"
+                                                             "\nTake the stairs"]
+                                                            ["Pass by"
+                                                             "\nPass by"]
+                                                            ["will be on the right" "will be on the right."]
+                                                            ["will be on the left" "will be on the left."]])
+                                "\nThis will be a " distance " (" distance-v " meter)" " walk taking up to "
+                                (str/replace duration "mins" "minutes") ",\n"
+                                "but probably ~" (math/movement-speed distance-v (my-average-walk-speed))
+                                " minutes (your personalized estimate),\n"
+                                "or a ~" (math/movement-speed distance-v (my-average-jog-speed)) " minute jog,\n"
+                                "or a ~" (math/movement-speed distance-v (my-average-run-speed)) " minute run.")
+               :distance distance-v})))))))
 
 (defn with-city-suffix [placename]
   (if *ignoring-city*
@@ -144,10 +153,9 @@
 
           :else placename)))
 
-(defn print-directions
-  "Print the directions from origin to destination using the Google Directions API."
+(defn correct-origin-destination
+  "Use heuristics and the Google Places API to correct origin and destination, or fail if either is too ambiguous."
   [origin destination]
-
   (if (= (str/lower-case origin) (str/lower-case destination))
     (errorln "Origin and destination are the same.")
 
@@ -170,11 +178,30 @@
               :else
               (let [origin (autocomplete-place origin)
                     destination (autocomplete-place destination)]
-                (println (--get-directions origin destination)))))
+                (list origin destination))))
 
       (let [origin (autocomplete-place origin)
             destination (autocomplete-place destination)]
-        (println (--get-directions origin destination))))))
+
+        (list origin destination)))))
+
+(defn get-directions
+  "Run (--get-directions) with corrected origin/destination."
+  [origin destination]
+  (apply --get-directions (correct-origin-destination origin destination)))
+
+(defn print-directions
+  "Print the directions from origin to destination using the Google Directions API."
+  [origin destination]
+  (println (:directions (get-directions origin destination))))
+
+(defn print-directions-cache
+  "Print any cached directions from origin to destination and return nil"
+  [origin destination]
+  (without-cache-messages
+   (let [[origin destination] (correct-origin-destination origin destination)]
+     (when (:cache-val (get-directions-get-url-and-cache-kv origin destination))
+       (println (:directions (--get-directions origin destination)))))))
 
 (defn find-path []
   (let [str (read-line)
