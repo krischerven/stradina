@@ -34,7 +34,7 @@
                     (write-store-to-file)
                     store))]
     (cond (and (= k :city) (< (count (str/split v #",")) 2))
-          (when (yesno (str "Storing :city without a state/province/country name (eg: Detroit, MI) is unwise."
+          (when (yesno (str "Storing :city without a state/province/country name (eg: Detroit, MI) is not recommended."
                             "\nContinue anyway?"))
             (body))
           :else (body))))
@@ -51,7 +51,9 @@
 (defn store-swap [k]
   (let [v (get @store k)]
     (if (boolean? v)
-      (store-assoc k (not v))
+      (do
+        (store-assoc k (not v))
+        nil)
       (error "store-swap (%s): '%s' is not a boolean" k v))))
 
 (defn store-rename-key [k1 k2]
@@ -163,6 +165,9 @@
 
 (defn movement-data []
   (store-get :movement-data))
+
+(defn remove-movement-data-where-tag= [tag]
+  (store-assoc :movement-data (filter #(not= (:tag %) tag) (movement-data))))
 
 (defn update-movement-data-point [idx k v]
   (store-assoc :movement-data
