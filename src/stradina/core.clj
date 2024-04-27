@@ -193,6 +193,9 @@
 (defn print-directions
   "Print the directions from origin to destination using the Google Directions API."
   [origin destination]
+  (store-assoc :directions-history
+               (conj (or (store-get :directions-history) [])
+                     (format "(print-directions \"%s\" \"%s\")" origin destination)))
   (println (:directions (get-directions origin destination))))
 
 (defn print-directions-cache
@@ -202,6 +205,11 @@
    (let [[origin destination] (correct-origin-destination origin destination)]
      (when (:cache-val (get-directions-get-url-and-cache-kv origin destination))
        (println (:directions (--get-directions origin destination)))))))
+
+(defn directions-history []
+  (run! println (reverse (take-last 10 (store-get :directions-history))))
+  (when (> (count (store-get :directions-history)) 10)
+    (println "Truncating older items...")))
 
 (defn add-walk-data-point-from-directions [origin destination time]
   (let [distance (:distance (get-directions origin destination))]
