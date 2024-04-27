@@ -24,6 +24,11 @@
   `(binding [*cache-messages-on* false]
      ~@body))
 
+(defonce ^:dynamic *internet-access-enabled* true)
+(defmacro without-internet-access [& body]
+  `(binding [*internet-access-enabled* false]
+     ~@body))
+
 (defn cache-messages []
   (and (store-get :print-cache-messages) *cache-messages-on*))
 
@@ -70,7 +75,7 @@
             (println "(Using cached data)")))
         (assert (and (:date cache-val) (:data cache-val))))
 
-      (let [response (if cache-val nil (client/get url))
+      (let [response (if cache-val nil (client-get url))
             data (or (:data cache-val) (json/read-str (:body response) :key-fn keyword))]
 
         (cache-assoc? cache-key {:date (current-timestamp) :type +cached-get-directions-data+ :data data})
@@ -112,6 +117,13 @@
       (str placename ", " city)
       placename)))
 
+(defn client-get
+  "A wrapper around client/get that only works when *internet-access-enabled* is true."
+  [url & [req & r]]
+  (if *internet-access-enabled*
+    (apply client/get url req r)
+    (error "client-get called when internet access is disabled")))
+
 (defn autocomplete-place
   "Autocomplete a place using the Google Places API."
   [placename]
@@ -126,7 +138,7 @@
                       nil)
                     (cache-get cache-key))
         data (or (:data cache-val)
-                 (-> (client/get url {:query-params params}) :body (json/read-str :key-fn keyword)))]
+                 (-> (client-get url {:query-params params}) :body (json/read-str :key-fn keyword)))]
     (when cache-val
       (when (cache-messages)
         (formatln (str "Using cached autocomplete data (as of %s). "
