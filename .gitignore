@@ -24,4 +24,4 @@ store
 store.back.*
 /target
 tmpfile
-todo.org
+todo*.org
