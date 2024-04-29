@@ -118,7 +118,8 @@
                                        :type :walk
                                        :time (current-timestamp)
                                        :meters meters
-                                       :seconds seconds})))
+                                       :seconds seconds}))
+  nil)
 
 (defn add-jog-data-point [tag meters seconds]
   (store-assoc :movement-data (conj (or (store-get :movement-data) [])
@@ -126,7 +127,8 @@
                                        :type :jog
                                        :time (current-timestamp)
                                        :meters meters
-                                       :seconds seconds})))
+                                       :seconds seconds}))
+  nil)
 
 (defn add-run-data-point [tag meters seconds]
   (store-assoc :movement-data (conj (or (store-get :movement-data) [])
@@ -134,7 +136,8 @@
                                        :type :run
                                        :time (current-timestamp)
                                        :meters meters
-                                       :seconds seconds})))
+                                       :seconds seconds}))
+  nil)
 
 (defn add-walk-data-point-with-note [tag note meters seconds]
   (store-assoc :movement-data (conj (or (store-get :movement-data) [])
@@ -164,7 +167,7 @@
                                   :seconds seconds})))
 
 (defn movement-data []
-  (store-get :movement-data))
+  (map #(assoc % :meters-per-second (/ (:meters %) (:seconds %) 1.0)) (store-get :movement-data)))
 
 (defn remove-movement-data-where-tag= [tag]
   (store-assoc :movement-data (filter #(not= (:tag %) tag) (movement-data))))

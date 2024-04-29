@@ -1,5 +1,5 @@
 (defproject stradina "0.1.0"
-  :description "An interactive Clojure program about walking."
+  :description "An interactive research program about walking and urban form."
   :url "https://git.krischerven.info/dev/stradina"
   :license {:name "AGPL-3.0-or-later"
             :url "https://www.gnu.org/licenses/agpl-3.0.en.html#license-text"}
