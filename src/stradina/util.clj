@@ -3,6 +3,7 @@
   (:require [clojure.pprint :refer [pprint]]
             [clojure.java.io :as io]
             [clojure.string :as str]
+            [clojure.test :refer [deftest]]
             [clojure.edn :as edn]))
 
 (defn formatln
@@ -99,3 +100,17 @@
 
 (defn map-keys [f m]
   (zipmap (map f (keys m)) (vals m)))
+
+(defn timestring-to-seconds
+  "Convert a string like '1534' into 934 (seconds)"
+  [timestring]
+  (assert (>= (count timestring) 3))
+  (let [secs (Integer/parseInt (subs timestring (- (count timestring) 2)))
+        mins (Integer/parseInt (subs timestring 0 (- (count timestring) 2)))]
+    (+ secs (* mins 60))))
+
+(deftest test-timestring-to-seconds []
+  (test/is (= (timestring-to-seconds "1926") 1166))
+  (test/is (= (timestring-to-seconds "1834") 1114))
+  (test/is (= (timestring-to-seconds "1537") 937))
+  (test/is (= (timestring-to-seconds "909") 549)))
