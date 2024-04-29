@@ -1,0 +1,5 @@
+#+title: Conventions
+(Note: brackets are to be ignored)
+
+#+subtitle: |[varname]|
+[varname] is a debug variable.
