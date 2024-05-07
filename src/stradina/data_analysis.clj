@@ -40,6 +40,24 @@
       (* (Math/sqrt (/ (my-average-walk-speed) math/typical-walk-speed)) math/typical-run-speed)
       math/typical-run-speed)))
 
+(defn my-average-walk-time []
+  (if (seq (walk-data))
+    (math/mean (map #(/ (:seconds %) 60 1.0)
+                    (filter #(not (:ignore %)) (walk-data))))
+    ##NaN))
+
+(defn my-average-jog-time []
+  (if (seq (jog-data))
+    (math/mean (map #(/ (:seconds %) 60 1.0)
+                    (filter #(not (:ignore %)) (jog-data))))
+    ##NaN))
+
+(defn my-average-run-time []
+  (if (seq (run-data))
+    (math/mean (map #(/ (:seconds %) 60 1.0)
+                    (filter #(not (:ignore %)) (run-data))))
+    ##NaN))
+
 (defn calculate-rectangle-acreage [time-across time-lengthwise]
   (* 640
      (/ (* time-across (my-average-walk-speed)) math/meters-per-mile)
