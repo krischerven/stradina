@@ -224,15 +224,18 @@
     (println "Truncating older items...")))
 
 (defn add-walk-data-point-from-directions [origin destination time]
-  (let [distance (:distance (get-directions origin destination))]
+  (let [distance (:distance (get-directions origin destination))
+        time (if (string? time) (timestring-to-seconds time) time)]
     (add-walk-data-point (str origin " to " destination) distance time)))
 
 (defn add-jog-data-point-from-directions [origin destination time]
-  (let [distance (:distance (get-directions origin destination))]
+  (let [distance (:distance (get-directions origin destination))
+        time (if (string? time) (timestring-to-seconds time) time)]
     (add-jog-data-point (str origin " to " destination) distance time)))
 
 (defn add-run-data-point-from-directions [origin destination time]
-  (let [distance (:distance (get-directions origin destination))]
+  (let [distance (:distance (get-directions origin destination))
+        time (if (string? time) (timestring-to-seconds time) time)]
     (add-run-data-point (str origin " to " destination) distance time)))
 
 (defn find-path []
