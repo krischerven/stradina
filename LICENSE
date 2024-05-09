@@ -2,7 +2,7 @@ SOFTWARE LICENSING
 
 You are licensed to use the source code of Stradina in one of two ways:
 
-1. Under the Free Software Foundation’s GNU AGPL v.3.0, subject to the exceptions outlined in this policy; or
+1. Under the Free Software Foundation's GNU AGPL v.3.0, subject to the exceptions outlined in this policy; or
 2. Under a commercial license available by contacting Kris Cherven at krischerven@gmail.com
 
 We promise that we will not enforce the copyleft provisions in AGPL v3.0 against you if your application you have not modified, added to or adapted the source code of Stradina in a way that results in the creation of a noncommercial “modified version” or “work based on” Stradina as these terms are defined in the AGPL v3.0 license. In other words, you are free to use this library in any noncommercially distributed program without worrying about distributing the source code of that program.
