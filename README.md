@@ -1,6 +1,6 @@
 # Stradina
 
-An interactive Clojure program about walking.
+An interactive research program about walking and urban form.
 
 ## Usage
 
