@@ -4,7 +4,17 @@ An interactive research program about walking and urban form.
 
 ## Usage
 
-Run the project in a REPL like Cider or Calva.
+Binaries are not provided for Stradina, which is intended to be run as an interactive Clojure program.
+To run Stradina, you need to install Clojure and an IDE such as Cider (Emacs) or Calva (VSCode).
+
+https://clojure.org/guides/install_clojure
+
+After installing Clojure, simply run the project in your IDE of choice.
+
+``` clojure
+(add-API-key :maps "FIXME_PUT_YOUR_API_KEY_HERE")
+(print-directions "Detroit Institute of Art, Detroit, MI" "Max M. & Marjorie S. Fisher Music Center, Detroit, MI")
+```
 
 ## License
 
