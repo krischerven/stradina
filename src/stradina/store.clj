@@ -169,6 +169,19 @@
 (defn movement-data []
   (map #(assoc % :meters-per-second (/ (:meters %) (:seconds %) 1.0)) (store-get :movement-data)))
 
+(defn most-recent-movement-data []
+  (first (movement-data)))
+
+(defn add-movement-data-note
+  "Add a note to the most recent movement datum."
+  [note]
+  (if (seq (store-get :movement-data))
+    (let [datum (first (store-get :movement-data))
+          movement-data (rest (store-get :movement-data))]
+      (store-assoc :movement-data (conj movement-data (assoc datum :note note)))
+      (most-recent-movement-data))
+    (error "add-movement-data-note: There is no stored movement data yet.")))
+
 (defn remove-movement-data-where-tag= [tag]
   (store-assoc :movement-data (filter #(not= (:tag %) tag) (movement-data))))
 
