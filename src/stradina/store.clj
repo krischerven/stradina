@@ -37,7 +37,8 @@
           (when (yesno (str "Storing :city without a state/province/country name (eg: Detroit, MI) is not recommended."
                             "\nContinue anyway?"))
             (body))
-          :else (body))))
+          :else (body))
+    nil))
 
 (defn store-assoc? [k v]
   (if-not (get @store k)
@@ -46,7 +47,7 @@
 (defn store-dissoc [k]
   (swap! store (fn [store] (dissoc store k)))
   (write-store-to-file)
-  store)
+  nil)
 
 (defn store-swap [k]
   (let [v (get @store k)]
