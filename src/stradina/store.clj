@@ -76,7 +76,9 @@
 
 ;; Storing API keys
 (defn add-API-key [name API-key]
-  (store-assoc :API-keys (assoc (or (store-get :API-keys) {}) name API-key)))
+  (if (= API-key "FIXME_PUT_YOUR_API_KEY_HERE")
+    (error "You have to replace \"FIXME_PUT_YOUR_API_KEY_HERE\" with the actual API key.")
+    (store-assoc :API-keys (assoc (or (store-get :API-keys) {}) name API-key))))
 
 (defn get-API-key? [key-name]
   (get (store-get :API-keys) key-name))
