@@ -185,6 +185,10 @@
       (most-recent-movement-data))
     (error "add-movement-data-note: There is no stored movement data yet.")))
 
+(defn remove-most-recent-movement-data []
+  (store-assoc :movement-data (rest (store-get :movement-data)))
+  (most-recent-movement-data))
+
 (defn remove-movement-data-where-tag= [tag]
   (store-assoc :movement-data (filter #(not= (:tag %) tag) (movement-data))))
 
@@ -198,6 +202,9 @@
 
 (defn walk-data []
   (filter #(= (:type %) :walk) (movement-data)))
+
+(defn grep-walk-data [str]
+  (filter #(str/includes? (:tag %) str) (walk-data)))
 
 (defn jog-data []
   (filter #(= (:type %) :jog) (movement-data)))

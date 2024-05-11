@@ -226,17 +226,20 @@
 (defn add-walk-data-point-from-directions [origin destination time]
   (let [distance (:distance (get-directions origin destination))
         time (if (string? time) (timestring-to-seconds time) time)]
-    (add-walk-data-point (str origin " to " destination) distance time)))
+    (add-walk-data-point (str origin " to " destination) distance time)
+    (first (walk-data))))
 
 (defn add-jog-data-point-from-directions [origin destination time]
   (let [distance (:distance (get-directions origin destination))
         time (if (string? time) (timestring-to-seconds time) time)]
-    (add-jog-data-point (str origin " to " destination) distance time)))
+    (add-jog-data-point (str origin " to " destination) distance time)
+    (first (jog-data))))
 
 (defn add-run-data-point-from-directions [origin destination time]
   (let [distance (:distance (get-directions origin destination))
         time (if (string? time) (timestring-to-seconds time) time)]
-    (add-run-data-point (str origin " to " destination) distance time)))
+    (add-run-data-point (str origin " to " destination) distance time)
+    (first (run-data))))
 
 (defn find-path []
   (let [str (read-line)
