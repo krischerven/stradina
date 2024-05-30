@@ -1,9 +1,10 @@
 (ns stradina.util
   (:gen-class)
   (:require [clojure.pprint :refer [pprint]]
+            [clojure.repl :refer [apropos]]
             [clojure.java.io :as io]
             [clojure.string :as str]
-            [clojure.test :refer [deftest]]
+            [clojure.test :as test :refer [deftest]]
             [clojure.edn :as edn]))
 
 (defn formatln
