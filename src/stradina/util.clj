@@ -127,3 +127,13 @@
   (test/is (= (timestring-to-seconds "1834") 1114))
   (test/is (= (timestring-to-seconds "1537") 937))
   (test/is (= (timestring-to-seconds "909") 549)))
+
+;; dynamic-function (autocomplete)
+;; FIXME check only stradina namespaces
+(defn df [kw]
+  (let [f (resolve (first (apropos kw)))
+        res (f)]
+      {:called f :result res}))
+
+(defn take-but-nth [n seq]
+  (take-last (- (count seq) n) seq))
