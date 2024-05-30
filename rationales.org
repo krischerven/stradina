@@ -1,0 +1,12 @@
+#+title: Rationales
+
+#+subtitle: store/cache are represented as Clojure code
+The store and cache are represented as Clojure code so you can quickly paste them into the REPL
+for debugging.
+
+#+subtitle: :movement-data over :walk-data + :jog-data + :run-data
+This is so you can work with movement data directly, in addition to each of the individual types
+of movement data (walk, jog, run)
+
+#+subtitle: :pending-walk-data, :pending-jog-data, :pending-run-data over :pending-movement-data
+This is because there is never a need to work generically with pending movement data

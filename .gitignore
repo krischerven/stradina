@@ -17,7 +17,6 @@ pom.xml
 pom.xml.asc
 /.prepl-port
 profiles.clj
-rationales.org
 src/stradina/untracked.clj
 src/stradina/whiteboard.clj
 store
