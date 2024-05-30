@@ -50,6 +50,10 @@
   (apply formatln (str question  " (y/n)") args)
   (=one (str/lower-case (read-line)) "y" "yes"))
 
+(defn get-input [command]
+  (println command)
+  (read-line))
+
 (defn error [err & fmt]
   (throw (RuntimeException. (apply format err fmt))))
 

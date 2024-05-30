@@ -238,6 +238,56 @@
     (add-run-data-point (str origin " to " destination) distance time)
     (first (run-data))))
 
+(defn finalize-pending-movement-data [data]
+  (doseq [datum data]
+    (let [[origin destination time] datum]
+      (when (yesno (str "Found datum {:origin %s :destination %s :time %s}. "
+                        "Finalize this datum?") origin destination time)
+
+        (let [origin (if (yesno "Is origin '%s' correct?" origin)
+                       origin
+                       (get-input "Enter the correct origin:"))
+
+              destination (if (yesno "Is destination '%s' correct?" destination)
+                            destination
+                            (get-input "Enter the correct destination:"))
+
+              time (if (yesno "Is time '%s' correct?" time)
+                     time
+                     (get-input "Enter the correct time:"))]
+
+          (add-walk-data-point-from-directions origin destination time))))))
+
+(defn pending-walk-data []
+  (store-get :pending-walk-data))
+
+(defn add-pending-walk-data-point [origin destination time]
+  (store-assoc :pending-walk-data
+               (conj (pending-walk-data) [origin destination time])))
+
+(defn finalize-pending-walk-data []
+  (finalize-pending-movement-data (pending-walk-data)))
+
+(defn pending-jog-data []
+  (store-get :pending-jog-data))
+
+(defn add-pending-jog-data-point [origin destination time]
+  (store-assoc :pending-jog-data
+               (conj (pending-jog-data) [origin destination time])))
+
+(defn finalize-pending-jog-data []
+  (finalize-pending-movement-data (pending-jog-data)))
+
+(defn pending-run-data []
+  (store-get :pending-run-data))
+
+(defn add-pending-run-data-point [origin destination time]
+  (store-assoc :pending-run-data
+               (conj (pending-run-data) [origin destination time])))
+
+(defn finalize-pending-run-data []
+  (finalize-pending-movement-data (pending-run-data)))
+
 (defn find-path []
   (let [str (read-line)
         split (str/split str #" to ")]
