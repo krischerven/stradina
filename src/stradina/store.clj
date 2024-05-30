@@ -121,7 +121,7 @@
                                        :type :walk
                                        :time (current-timestamp)
                                        :meters meters
-                                       :seconds seconds}))
+                                       :seconds (timestring-to-seconds? seconds)}))
   nil)
 
 (defn add-jog-data-point [tag meters seconds]
@@ -130,7 +130,7 @@
                                        :type :jog
                                        :time (current-timestamp)
                                        :meters meters
-                                       :seconds seconds}))
+                                       :seconds (timestring-to-seconds? seconds)}))
   nil)
 
 (defn add-run-data-point [tag meters seconds]
@@ -139,7 +139,7 @@
                                        :type :run
                                        :time (current-timestamp)
                                        :meters meters
-                                       :seconds seconds}))
+                                       :seconds (timestring-to-seconds? seconds)}))
   nil)
 
 (defn add-walk-data-point-with-note [tag note meters seconds]
@@ -149,7 +149,7 @@
                                   :note note
                                   :time (current-timestamp)
                                   :meters meters
-                                  :seconds seconds})))
+                                  :seconds (timestring-to-seconds? seconds)})))
 
 (defn add-jog-data-point-with-note [tag note meters seconds]
   (store-assoc :movement-data (conj (or (store-get :movement-data) [])
@@ -158,7 +158,7 @@
                                   :note note
                                   :time (current-timestamp)
                                   :meters meters
-                                  :seconds seconds})))
+                                  :seconds (timestring-to-seconds? seconds)})))
 
 (defn add-run-data-point-with-note [tag note meters seconds]
   (store-assoc :movement-data (conj (or (store-get :movement-data) [])
@@ -167,7 +167,7 @@
                                   :note note
                                   :time (current-timestamp)
                                   :meters meters
-                                  :seconds seconds})))
+                                  :seconds (timestring-to-seconds? seconds)})))
 
 (defn movement-data []
   (map #(assoc % :meters-per-second (/ (:meters %) (:seconds %) 1.0)) (store-get :movement-data)))

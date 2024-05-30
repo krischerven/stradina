@@ -110,6 +110,14 @@
         mins (Integer/parseInt (subs timestring 0 (- (count timestring) 2)))]
     (+ secs (* mins 60))))
 
+(defn timestring-to-seconds?
+  "If <timestring> is a string, then return (timestring-to-seconds <timestring>).
+  Otherwise, return <timestring>."
+  [timestring]
+  (if (string? timestring)
+    (timestring-to-seconds timestring)
+    timestring))
+
 (deftest test-timestring-to-seconds []
   (test/is (= (timestring-to-seconds "1926") 1166))
   (test/is (= (timestring-to-seconds "1834") 1114))
