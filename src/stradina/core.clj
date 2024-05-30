@@ -47,6 +47,13 @@
                     nil)
                   (cache-get cache-key))}))
 
+(defn client-get
+  "A wrapper around client/get that only works when *internet-access-enabled* is true."
+  [url & [req & r]]
+  (if *internet-access-enabled*
+    (apply client/get url req r)
+    (error "client-get called when internet access is disabled")))
+
 (defn --get-directions
   "Get the directions from origin to destination using the Google Directions API.
   Do not call this function directly from the REPL; instead, use print-directions."
@@ -116,13 +123,6 @@
     (if-let [city (store-get :city)]
       (str placename ", " city)
       placename)))
-
-(defn client-get
-  "A wrapper around client/get that only works when *internet-access-enabled* is true."
-  [url & [req & r]]
-  (if *internet-access-enabled*
-    (apply client/get url req r)
-    (error "client-get called when internet access is disabled")))
 
 (defn autocomplete-place
   "Autocomplete a place using the Google Places API."
