@@ -218,6 +218,13 @@
      (when (:cache-val (get-directions-get-url-and-cache-kv origin destination))
        (println (:directions (--get-directions origin destination)))))))
 
+(defn to
+  "An alias for (print-directions \"home\" \"$1\")"
+  [destination]
+  (if (store-get :home)
+    (print-directions "home" destination)
+    (errorln "No :home in store; aborting")))
+
 (defn directions-history []
   (run! println (reverse (take-last 10 (store-get :directions-history))))
   (when (> (count (store-get :directions-history)) 10)
