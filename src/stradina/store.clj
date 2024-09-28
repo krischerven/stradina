@@ -175,6 +175,9 @@
 (defn most-recent-movement-data []
   (first (movement-data)))
 
+(defn anonymize [data-list]
+  (map #(assoc % :tag "[REDACTED]" :note "[REDACTED]") (movement-data)))
+
 (defn add-movement-data-note
   "Add a note to the most recent movement datum."
   [note]
