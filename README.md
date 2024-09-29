@@ -18,7 +18,7 @@ After installing Clojure, simply run the project in your IDE of choice.
 
 ## License
 
-Copyright © 2024 The Stradina Contributors
+Copyright © 2024 Stradina Developers
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
