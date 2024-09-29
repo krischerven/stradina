@@ -29,6 +29,28 @@
   `(binding [*internet-access-enabled* false]
      ~@body))
 
+(defonce ^:dynamic *get-directions-mode* "walking")
+(defmacro driving [& body]
+  `(binding [*get-directions-mode* "driving"]
+     ~@body))
+
+(defmacro biking [& body]
+  `(binding [*get-directions-mode* "bicycling"]
+     ~@body))
+
+(defmacro transiting [& body]
+  `(binding [*get-directions-mode* "transit"]
+     ~@body))
+
+(defn walking? []
+  (= *get-directions-mode* "walking"))
+
+(defn movement-type []
+  (cond (= *get-directions-mode* "walking") "walk"
+        (= *get-directions-mode* "driving") "drive"
+        (= *get-directions-mode* "bicycling") "cycling"
+        (= *get-directions-mode* "transit") "transit trip"))
+
 (defn cache-messages []
   (and (store-get :print-cache-messages) *cache-messages-on*))
 
@@ -36,7 +58,7 @@
   (let [url (str "https://maps.googleapis.com/maps/api/directions/json"
                  "?origin=" origin
                  "&destination=" destination
-                 "&mode=walking"
+                 "&mode=" *get-directions-mode*
                  "&key=" (get-API-key :maps))
         cache-key url]
     {:url url
@@ -109,12 +131,19 @@
                                                              "\nPass by"]
                                                             ["will be on the right" "will be on the right."]
                                                             ["will be on the left" "will be on the left."]])
-                                "\nThis will be a " distance " (" distance-v " meter)" " walk taking up to "
-                                (str/replace duration "mins" "minutes") ",\n"
-                                "but probably ~" (math/movement-speed distance-v (my-average-walk-speed))
-                                " minutes (your personalized estimate),\n"
-                                "or a ~" (math/movement-speed distance-v (my-average-jog-speed)) " minute jog,\n"
-                                "or a ~" (math/movement-speed distance-v (my-average-run-speed)) " minute run.")
+                                "\nThis will be a " distance " (" distance-v " meter)" " " (movement-type)
+                                " taking up to "
+                                (str/replace duration "mins" "minutes")
+                                (if (walking?) ",\n" ".")
+                                (if (walking?) (str
+                                                "but probably ~" (math/movement-speed distance-v (my-average-walk-speed))
+                                                " minutes (your personalized estimate)"))
+                                (if (walking?) ",\n")
+                                (if (walking?) (str "or a ~" (math/movement-speed distance-v (my-average-jog-speed))
+                                    " minute jog,\n"))
+                                (if (walking?) (str "or a ~" (math/movement-speed distance-v (my-average-run-speed))
+                                    " minute run.")))
+
                :distance distance-v})))))))
 
 (defn with-city-suffix [placename]
