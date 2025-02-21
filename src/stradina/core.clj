@@ -4,7 +4,9 @@
             [clojure.data.json :as json]
             [clojure.string :as str]
             [stradina.math :as math])
-  (:use [stradina.data-analysis]
+  (:use [clojure.repl]
+        [stradina.AI]
+        [stradina.data-analysis]
         [stradina.util]
         [stradina.store]
         [stradina.cache]))
