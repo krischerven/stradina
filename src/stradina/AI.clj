@@ -9,17 +9,27 @@
 ;; https://ollama.com/download
 (defonce +ollama+ "ollama")
 (def +ollama-model+ "deepseek-r1")
+(defonce ^:dynamic *dummy-model* false)
+
+(defmacro with-dummy-model [& body]
+  `(binding [*dummy-model* true]
+     ~@body))
 
 (defn ask-AI-model-question-fg [question program model fixup-fn]
   (let [result
         (condp = program
-          +ollama+ (sh "/bin/bash" "-c" (format "echo \"%s\" | %s run %s" question program model))
+          +ollama+ (let [cmd (format "echo \"%s\" | %s run %s" question program model)]
+                     (if *dummy-model*
+                       (do
+                         (formatln "OLLAMA: Would have run '/bin/bash -c %s'" cmd)
+                         {:exit 0 :out ""})
+                       (sh "/bin/bash" "-c" cmd)))
           (error "Invalid program '%s'" program))]
     (if (= (:exit result) 0)
       (do
         (println)
         (println (fixup-fn (wrap-text (:out result) 80))))
-      (errorln "ask-AI-model-question ('%s' '%s' '%s') failed with exit code %s"
+      (errorln "ask-AI-model-question-fg ('%s' '%s' '%s') failed with exit code %s"
                question program model (:exit result)))))
 
 (defn ask-AI-model-question [question program model fixup-fn]
