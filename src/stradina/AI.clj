@@ -6,7 +6,8 @@
   (:require [clojure.string :as str]))
 
 ;; model constants
-(def +ollama+ "ollama")
+;; https://ollama.com/download
+(defonce +ollama+ "ollama")
 (def +ollama-model+ "deepseek-r1")
 
 (defn ask-AI-model-question-fg [question program model fixup-fn]
