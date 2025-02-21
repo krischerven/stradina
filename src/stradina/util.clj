@@ -57,14 +57,14 @@
 (defn error [err & fmt]
   (throw (RuntimeException. (apply format err fmt))))
 
-(defn replace-all [str patterns]
+(defn remove-all [str patterns]
   (loop [str str patterns patterns]
     (if (seq patterns)
       (recur (str/replace str (first patterns) "") (rest patterns))
       str)))
 
 (defn strip-html [text]
-  (replace-all text (list "<b>" "</b>" "<wbr/>" "<div style=\"font-size:0.9em\">" "<div>" "</div>")))
+  (remove-all text (list "<b>" "</b>" "<wbr/>" "<div style=\"font-size:0.9em\">" "<div>" "</div>")))
 
 (defn string-replace-multi [text replacement-pairs]
   (loop [text text pairs replacement-pairs]
@@ -137,3 +137,14 @@
 
 (defn take-but-nth [n seq]
   (take-last (- (count seq) n) seq))
+
+(defn wrap-text [s width]
+  (let [words (str/split s #"\s+")]
+    (loop [lines [] line [] remaining words]
+      (if (empty? remaining)
+        (str/join "\n" (conj lines (str/join " " line)))
+        (let [word (first remaining)
+              new-line (conj line word)]
+          (if (<= (count (str/join " " new-line)) width)
+            (recur lines new-line (rest remaining))
+            (recur (conj lines (str/join " " line)) [word] (rest remaining))))))))
