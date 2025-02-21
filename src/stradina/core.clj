@@ -12,51 +12,73 @@
         [stradina.cache]))
 
 (defonce ^:dynamic *invalidating-cache* false)
-(defmacro invalidating-cache [& body]
+(defmacro invalidating-cache
+  "Invalidates cached directions within a scope"
+  [& body]
   `(binding [*invalidating-cache* true]
      ~@body))
 
 (defonce ^:dynamic *ignoring-city* false)
-(defmacro ignoring-city [& body]
+(defmacro ignoring-city
+  "Ignores the city within a scope"
+  [& body]
   `(binding [*ignoring-city* true]
      ~@body))
 
 (defonce ^:dynamic *cache-messages-on* true)
-(defmacro without-cache-messages [& body]
+(defmacro without-cache-messages
+  "Suppresses cache messages within a scope"
+  [& body]
   `(binding [*cache-messages-on* false]
      ~@body))
 
 (defonce ^:dynamic *internet-access-enabled* true)
-(defmacro without-internet-access [& body]
+(defmacro without-internet-access
+  "Disables internet access within a scope"
+  [& body]
   `(binding [*internet-access-enabled* false]
      ~@body))
 
 (defonce ^:dynamic *get-directions-mode* "walking")
-(defmacro driving [& body]
+(defmacro driving
+  "Dynamically rebinds *get-directions-mode* to \"driving\" within a scope"
+  [& body]
   `(binding [*get-directions-mode* "driving"]
      ~@body))
 
-(defmacro biking [& body]
+(defmacro biking
+  "Dynamically rebinds *get-directions-mode* to \"biking\" within a scope"
+  [& body]
   `(binding [*get-directions-mode* "bicycling"]
      ~@body))
 
-(defmacro transiting [& body]
+(defmacro transiting
+  "Dynamically rebinds *get-directions-mode* to \"transiting\" within a scope"
+  [& body]
   `(binding [*get-directions-mode* "transit"]
      ~@body))
 
-(defn walking? []
+(defn walking?
+  "Returns true if the current movement mode is walking, else returns false"
+  []
   (= *get-directions-mode* "walking"))
 
-(defn movement-type []
+(defn movement-type
+  "Dynamically rebinds *get-directions-mode* to \"transiting\" within a scope"
+  []
   (cond (= *get-directions-mode* "walking") "walk"
         (= *get-directions-mode* "driving") "drive"
         (= *get-directions-mode* "bicycling") "cycling"
         (= *get-directions-mode* "transit") "transit trip"))
 
-(defn cache-messages []
+(defn cache-messages
+  "Returns true if cache-messages are logged, else returns false"
+  []
   (and (store-get :print-cache-messages) *cache-messages-on*))
 
-(defn get-directions-get-url-and-cache-kv [origin destination]
+(defn --get-directions-get-url-and-cache-kv
+  "Does what it says on the tin; only invoked by (--get-directions) and (print-directions-cache)"
+  [origin destination]
   (let [url (str "https://maps.googleapis.com/maps/api/directions/json"
                  "?origin=" origin
                  "&destination=" destination
@@ -72,7 +94,7 @@
                   (cache-get cache-key))}))
 
 (defn client-get
-  "A wrapper around client/get that only works when *internet-access-enabled* is true."
+  "A wrapper around client/get that only works when internet access is enabled"
   [url & [req & r]]
   (if *internet-access-enabled*
     (apply client/get url req r)
@@ -80,7 +102,7 @@
 
 (defn --get-directions
   "Get the directions from origin to destination using the Google Directions API.
-  Do not call this function directly from the REPL; instead, use print-directions."
+  Do not call this function directly from the REPL; instead, use print-directions"
   [origin destination]
 
   (when-let [continue (if-not (store-get :city)
@@ -95,7 +117,7 @@
     (let [{url :url
            cache-key :cache-key
            cache-val :cache-val}
-          (get-directions-get-url-and-cache-kv origin destination)]
+          (--get-directions-get-url-and-cache-kv origin destination)]
 
       (when cache-val
         (if (cache-messages)
@@ -148,7 +170,15 @@
 
                :distance distance-v})))))))
 
-(defn with-city-suffix [placename]
+(defn with-city-suffix
+  "Returns the provided <placename> string with the current city as a suffix.
+
+  ;; For example:
+  (with-store-assoc :city \"Detroit, MI\"
+    (with-city-suffix \"DIA\")) ;; => \"DIA, Detroit, MI\"
+  "
+
+  [placename]
   (if *ignoring-city*
     placename
     (if-let [city (store-get :city)]
@@ -184,7 +214,10 @@
       (errorln "No results in autocomplete-place for placename \"%s\"" placename))
     (:description (first (:predictions data)))))
 
-(defn replace-aliases [placename]
+(defn replace-aliases
+  "Replace the aliases \"home\" or \"old home\" IF they are contained in the store,
+  as well as any aliases contained within (store-get :aliases)"
+  [placename]
   (let [l-placename (str/lower-case placename)]
     (cond (=one l-placename "home" "old home")
 
@@ -246,7 +279,7 @@
   [origin destination]
   (without-cache-messages
    (let [[origin destination] (correct-origin-destination origin destination)]
-     (when (:cache-val (get-directions-get-url-and-cache-kv origin destination))
+     (when (:cache-val (--get-directions-get-url-and-cache-kv origin destination))
        (println (:directions (--get-directions origin destination)))))))
 
 (defn to
@@ -256,7 +289,9 @@
     (print-directions "home" destination)
     (errorln "No :home in store; aborting")))
 
-(defn directions-history []
+(defn directions-history
+  "Print the last 10 items in direction history"
+  []
   (run! println (reverse (take-last 10 (store-get :directions-history))))
   (when (> (count (store-get :directions-history)) 10)
     (println "Truncating older items...")))
@@ -326,14 +361,19 @@
 (defn finalize-pending-run-data []
   (finalize-pending-movement-data (pending-run-data)))
 
-(defn find-path []
+(defn find-path
+  "Interactively prompts the user for a string in the format of 'LOC1 to LOC2', then
+runs (print-directions <LOC1> <LOC2>)"
+  []
   (let [str (read-line)
         split (str/split str #" to ")]
     (if (= (count split) 2)
       (print-directions (first split) (second split))
       (error "Wrong format: Should be '[loc1] to [loc2]'"))))
 
-(defn doctor []
+(defn doctor
+  "Debugs trivially fixable problems with your Stradina configuration."
+  []
   (println "The doctor will see you now...")
   (let [problems (atom 0)]
     (letfn [(problem [severity desc]

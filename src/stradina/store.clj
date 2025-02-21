@@ -40,6 +40,20 @@
           :else (body))
     nil))
 
+(defmacro with-store-assoc [k v & body]
+  "store-assocs <k> to <v> for the duration of the scope."
+  (let [filledp (gensym)
+        original (gensym)
+        return (gensym)]
+    `(let [~filledp (contains? @store ~k)
+           ~original (store-get ~k)]
+       (store-assoc ~k ~v)
+       (let [~return (do ~@body)]
+         (if ~filledp
+           (store-assoc ~k ~original)
+           (store-dissoc ~k))
+         ~return))))
+
 (defn store-assoc? [k v]
   (if-not (get @store k)
     (store-assoc k v)))
@@ -67,6 +81,9 @@
 
 (defn store-get [k]
   (get @store k))
+
+(defn store-has [k]
+  (contains? @store k))
 
 (defn store-get! [k]
   (let [v (get @store k)]
