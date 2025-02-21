@@ -1,6 +1,6 @@
 # Stradina
 
-An interactive research program about walking and urban form.
+An interactive research application used to analyze travel data.
 
 ## Usage
 
