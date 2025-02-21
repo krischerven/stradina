@@ -17,6 +17,7 @@ pom.xml
 pom.xml.asc
 /.prepl-port
 profiles.clj
+src/stradina/later.clj
 src/stradina/untracked.clj
 src/stradina/whiteboard.clj
 store
