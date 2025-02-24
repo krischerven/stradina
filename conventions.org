@@ -1,5 +1,24 @@
 #+title: Conventions
 (Note: brackets are to be ignored)
 
-#+subtitle: |[varname]|
-[varname] is a debug variable.
+#+subtitle: |[value]|
+[value] is a debug value/variable.
+
+#+subtitle: <argument>
+This is how arguments are referred to in docstrings.
+
+#+BEGIN_SRC clojure
+;; Good
+(defn store-assoc?
+  "Run (store-assoc <k> <v>) if <k> is not already in the store."
+  [k v]
+  ;; etc...
+  )
+
+;; Bad
+(defn store-assoc?
+  "Run (store-assoc k v) if k is not already in the store."
+  [k v]
+  ;; etc...
+  )
+#+END_SRC
