@@ -12,8 +12,24 @@ https://clojure.org/guides/install_clojure
 After installing Clojure, simply run the project in your IDE of choice.
 
 ``` clojure
+;; Add a Google Maps API key
 (add-API-key :maps "FIXME_PUT_YOUR_API_KEY_HERE")
+
+;; Print customized directions between two local destinations
 (print-directions "Detroit Institute of Art, Detroit, MI" "Max M. & Marjorie S. Fisher Music Center, Detroit, MI")
+
+;; Add a walk data point to local storage (330 meters, 300 seconds)
+(add-walk-data-point "Somewhere I went earlier" 330 300)
+
+;; Add a walk data point to local storage (500 meters, 300 seconds)
+(add-walk-data-point-with-note "Somewhere I went after that" "NOTE: walked about 50% faster than usual" 500 300)
+
+;; Check our walk speed/time
+(my-average-walk-speed)
+(my-average-walk-time)
+
+;; Ask a local AI model to interpret our walk data (redacting notes and tags to be safe)
+(ollama-interpret-movement-data (redact (walk-data)))
 ```
 
 ## License
