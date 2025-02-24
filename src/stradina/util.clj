@@ -7,6 +7,16 @@
             [clojure.test :as test :refer [deftest]]
             [clojure.edn :as edn]))
 
+(defmacro niling [& body]
+  `(do ~@body nil))
+
+(def ^:private deftemp-count (atom 0))
+(defmacro deftemp [v]
+  (let [sym (symbol (str "tmp" (swap! deftemp-count inc)))]
+    `(do
+       (def ~sym ~v)
+       '~sym)))
+
 (defn formatln
   "Formats a string using format and prints it to the console."
   [msg & args]
@@ -99,9 +109,6 @@
   (with-open [writer (io/writer file-path)]
     (binding [*out* writer]
       (print (pr-str map)))))
-
-(defmacro niling [& body]
-  `(do ~@body nil))
 
 (defn map-keys [f m]
   (zipmap (map f (keys m)) (vals m)))
