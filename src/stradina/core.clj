@@ -11,35 +11,35 @@
         [stradina.store]
         [stradina.cache]))
 
-(defonce ^:dynamic *invalidating-cache* false)
+(defonce ^:dynamic ^:private *invalidating-cache* false)
 (defmacro invalidating-cache
   "Invalidates cached directions within a scope"
   [& body]
   `(binding [*invalidating-cache* true]
      ~@body))
 
-(defonce ^:dynamic *ignoring-city* false)
+(defonce ^:dynamic ^:private *ignoring-city* false)
 (defmacro ignoring-city
   "Ignores the city within a scope"
   [& body]
   `(binding [*ignoring-city* true]
      ~@body))
 
-(defonce ^:dynamic *cache-messages-on* true)
+(defonce ^:dynamic ^:private *cache-messages-on* true)
 (defmacro without-cache-messages
   "Suppresses cache messages within a scope"
   [& body]
   `(binding [*cache-messages-on* false]
      ~@body))
 
-(defonce ^:dynamic *internet-access-enabled* true)
+(defonce ^:dynamic ^:private *internet-access-enabled* true)
 (defmacro without-internet-access
   "Disables internet access within a scope"
   [& body]
   `(binding [*internet-access-enabled* false]
      ~@body))
 
-(defonce ^:dynamic *get-directions-mode* "walking")
+(defonce ^:dynamic ^:private *get-directions-mode* "walking")
 (defmacro driving
   "Dynamically rebinds *get-directions-mode* to \"driving\" within a scope"
   [& body]
